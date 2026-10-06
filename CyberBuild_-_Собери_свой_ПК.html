@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberBuild School - Собери свой ПК</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#0a0d14',
+                            card: '#121824',
+                            accent: '#00f0ff',
+                            purple: '#7000ff',
+                            pink: '#ff007f',
+                            green: '#00ff66',
+                            yellow: '#ffcc00'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        exo: ['Exo 2', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: #07090e;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Neon Glow Effects */
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.2);
+            border: 1px solid rgba(0, 240, 255, 0.6);
+        }
+        
+        .neon-border-purple {
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.4), inset 0 0 15px rgba(112, 0, 255, 0.2);
+            border: 1px solid rgba(112, 0, 255, 0.6);
+        }
+
+        .neon-border-pink {
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+            border: 1px solid rgba(255, 0, 127, 0.6);
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .neon-text-purple {
+            text-shadow: 0 0 10px rgba(112, 0, 255, 0.7), 0 0 20px rgba(112, 0, 255, 0.5);
+        }
+
+        .glass-panel {
+            background: rgba(18, 24, 36, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Pulse animations */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0d14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* Drag and Drop styling */
+        .draggable-item {
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+        .drop-slot.drag-over {
+            border-color: #00f0ff !important;
+            background: rgba(0, 240, 255, 0.15) !important;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+        }
+
+        /* Animated Grid Background */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-grid min-h-screen text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-cyan-900/40 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                    <i class="fa-solid fa-microchip text-xl text-black font-bold"></i>
+                </div>
+                <span class="font-orbitron font-extrabold text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500">
+                    CYBER<span class="text-white">BUILD</span>
+                </span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex space-x-1 lg:space-x-2 bg-slate-900/80 p-1.5 rounded-full border border-slate-800">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-5 py-2 rounded-full font-medium text-sm transition-all duration-300 text-cyan-400 bg-slate-800 shadow-sm">
+                    <i class="fa-solid fa-house mr-2"></i>Главная & Теория
+                </button>
+                <button onclick="switchTab('builder')" id="nav-builder" class="nav-btn px-5 py-2 rounded-full font-medium text-sm transition-all duration-300 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-screwdriver-wrench mr-2"></i>Конструктор ПК
+                </button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn px-5 py-2 rounded-full font-medium text-sm transition-all duration-300 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-gamepad mr-2"></i>Викторина и Бот
+                </button>
+            </nav>
+
+            <!-- Sound toggle button -->
+            <button id="sound-btn" onclick="toggleSound()" class="px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-cyan-400 border border-slate-700 text-sm transition-all flex items-center gap-2">
+                <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+                <span class="hidden sm:inline text-xs font-semibold">ЗВУК</span>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Bottom Bar -->
+        <div class="flex md:hidden justify-around mt-2 pt-2 border-t border-slate-800 text-xs">
+            <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 text-cyan-400">
+                <i class="fa-solid fa-house text-base"></i> Теория
+            </button>
+            <button onclick="switchTab('builder')" class="flex flex-col items-center gap-1 text-slate-400">
+                <i class="fa-solid fa-screwdriver-wrench text-base"></i> Конструктор
+            </button>
+            <button onclick="switchTab('quiz')" class="flex flex-col items-center gap-1 text-slate-400">
+                <i class="fa-solid fa-gamepad text-base"></i> Викторина
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- SECTION 1: HOME & THEORY -->
+        <section id="tab-home" class="tab-content space-y-12">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden glass-panel p-8 lg:p-12 border border-cyan-500/30 neon-border-cyan flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="absolute -top-24 -left-24 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="space-y-6 max-w-2xl text-center md:text-left z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> Школьный онлайн-практикум
+                    </div>
+                    <h1 class="font-orbitron text-3xl sm:text-5xl font-black leading-tight tracking-wide">
+                        ИЗУЧИ И СОБЕРИ <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 neon-text-cyan">
+                            СВОЙ ИДЕАЛЬНЫЙ ПК
+                        </span>
+                    </h1>
+                    <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+                        Добро пожаловать в виртуальную лабораторию! Узнай, как устроены внутренности компьютера, виртуально собери геймерскую станцию и сразись в интеллектуальной битве с умным Ботом и другими игроками!
+                    </p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+                        <button onclick="switchTab('builder')" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold font-orbitron tracking-wider shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i> Начать сборку
+                        </button>
+                        <button onclick="switchTab('quiz')" class="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/40 font-bold font-orbitron tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                            <i class="fa-solid fa-trophy"></i> Викторина с ботом
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Animated Interactive Tech Cube Visual -->
+                <div class="relative w-64 h-64 sm:w-80 sm:h-80 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full border-2 border-dashed border-cyan-500/30 animate-[spin_20s_linear_infinite]"></div>
+                    <div class="absolute inset-4 rounded-full border border-purple-500/40 animate-[spin_15s_linear_infinite_reverse]"></div>
+                    <div class="w-44 h-44 sm:w-52 sm:h-52 bg-slate-900/90 rounded-2xl border border-cyan-400/50 p-6 flex flex-col items-center justify-center text-center shadow-2xl neon-border-cyan animate-pulse-glow">
+                        <i class="fa-solid fa-computer text-5xl text-cyan-400 mb-3"></i>
+                        <span class="font-orbitron text-xs tracking-widest text-purple-300 uppercase">Системный Блок</span>
+                        <span class="text-xs text-slate-400 mt-1">8 Главных компонентов</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Theory Section -->
+            <div class="space-y-6">
+                <div class="text-center max-w-2xl mx-auto space-y-2">
+                    <h2 class="font-orbitron text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+                        ТЕОРИЯ: ИЗ ЧЕГО СОСТОИТ КОМПЬЮТЕР?
+                    </h2>
+                    <p class="text-slate-400 text-sm">Кликни по компоненту, чтобы изучить его назначение и ключевые характеристики!</p>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="theory-grid">
+                    <!-- Dynamic rendering via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: PC BUILDER -->
+        <section id="tab-builder" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-cyan-500/30 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="font-orbitron text-2xl font-bold text-cyan-400 flex items-center gap-2">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> КОНСТРУКТОР СБОРКИ ПК
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Перетаскивай детали из левого меню в соответствующие слоты корпуса компьютера справа!</p>
+                </div>
+                <!-- Stats Header -->
+                <div class="flex items-center gap-4 bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-700">
+                    <div class="text-center">
+                        <div class="text-xs text-slate-400">Стоимость</div>
+                        <div id="builder-price" class="font-orbitron text-lg font-bold text-green-400">0 ₽</div>
+                    </div>
+                    <div class="h-8 w-[1px] bg-slate-700"></div>
+                    <div class="text-center">
+                        <div class="text-xs text-slate-400">Мощность</div>
+                        <div id="builder-power" class="font-orbitron text-lg font-bold text-cyan-400">0 FPS</div>
+                    </div>
+                    <div class="h-8 w-[1px] bg-slate-700"></div>
+                    <button onclick="resetBuilder()" class="px-3 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-500/40 text-xs font-semibold transition-all">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Сброс
+                    </button>
+                </div>
+            </div>
+
+            <!-- Builder Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Available Components Drawer -->
+                <div class="lg:col-span-5 glass-panel p-5 rounded-2xl space-y-4 max-h-[700px] overflow-y-auto">
+                    <h3 class="font-orbitron text-sm font-bold uppercase tracking-wider text-purple-300 flex items-center gap-2 border-b border-slate-800 pb-3">
+                        <i class="fa-solid fa-boxes-stacked"></i> Доступные Комплектующие
+                    </h3>
+                    <div id="parts-palette" class="space-y-3">
+                        <!-- Dynamic items generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Virtual Case Slots Dropzone -->
+                <div class="lg:col-span-7 glass-panel p-6 rounded-2xl relative border border-slate-700 flex flex-col justify-between min-h-[550px]">
+                    <!-- Background Visual PC Case outline -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-slate-900/40 to-cyan-950/20 rounded-2xl pointer-events-none"></div>
+                    
+                    <div class="relative z-10 space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <span class="font-orbitron text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                                <i class="fa-solid fa-box text-cyan-400 mr-2"></i>Слоты Материнской Платы и Корпуса
+                            </span>
+                            <span id="assembly-progress" class="text-xs font-bold font-orbitron px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">
+                                Собрано: 0 / 7
+                            </span>
+                        </div>
+
+                        <!-- Slots Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="slots-container">
+                            <!-- Dynamic Slots generated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Test Run & Results Bar -->
+                    <div class="relative z-10 mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-xs text-slate-400">
+                            <span class="text-cyan-400 font-bold">Подсказка:</span> Нажми на установленный элемент, чтобы извлечь его обратно.
+                        </div>
+                        <button id="test-build-btn" onclick="runBuildTest()" disabled class="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-800 text-slate-500 font-bold font-orbitron text-sm tracking-wider cursor-not-allowed transition-all">
+                            <i class="fa-solid fa-power-off mr-2"></i> ЗАПУСТИТЬ ПК
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: QUIZ & BOT ARENA -->
+        <section id="tab-quiz" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Sidebar: Bot Assistant & Live Leaderboard -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- AI Bot Avatar Panel -->
+                    <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 text-center relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-2xl"></div>
+                        
+                        <!-- Bot Avatar -->
+                        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 p-1 mb-3 animate-pulse-glow">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-robot text-3xl text-cyan-400" id="bot-avatar-icon"></i>
+                            </div>
+                        </div>
+
+                        <h3 class="font-orbitron font-bold text-lg text-white">КИБЕР-БОТ «BYTE»</h3>
+                        <p class="text-xs text-cyan-400 font-medium">Ваш виртуальный экзаменатор</p>
+
+                        <!-- Bot Dialog Bubble -->
+                        <div class="mt-4 p-3.5 bg-slate-900/90 rounded-xl border border-slate-700 text-xs text-slate-300 text-left relative min-h-[70px] flex items-center">
+                            <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-slate-700"></div>
+                            <p id="bot-dialog-text">Привет! Я бот Byte. Готов проверить свои знания о комплектующих компьютера? Выбери режим и начнем игру!</p>
+                        </div>
+                    </div>
+
+                    <!-- Simulated Multiplayer Leaderboard -->
+                    <div class="glass-panel p-5 rounded-2xl space-y-4">
+                        <h4 class="font-orbitron text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                            <span><i class="fa-solid fa-ranking-star text-yellow-400 mr-2"></i>ТАБЛИЦА ЛИДЕРОВ (LIVE)</span>
+                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        </h4>
+
+                        <div class="space-y-2.5 text-xs" id="leaderboard-list">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Area: Interactive Quiz Playfield -->
+                <div class="lg:col-span-8 glass-panel p-6 sm:p-8 rounded-2xl border border-purple-500/30 flex flex-col justify-between min-h-[500px]">
+                    <!-- Quiz Header Info -->
+                    <div>
+                        <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="px-3 py-1 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-xs font-bold font-orbitron" id="quiz-question-counter">
+                                    Вопрос 1 / 5
+                                </span>
+                                <span class="text-xs text-slate-400 font-semibold" id="quiz-category">Категория: Комплектующие</span>
+                            </div>
+                            <!-- Timer Badge -->
+                            <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700 text-yellow-400 font-orbitron font-bold text-sm">
+                                <i class="fa-solid fa-stopwatch animate-bounce"></i>
+                                <span id="quiz-timer">15 сек</span>
+                            </div>
+                        </div>
+
+                        <!-- Question Text -->
+                        <div class="mt-6 space-y-2">
+                            <h3 id="quiz-question-text" class="text-lg sm:text-xl font-bold text-slate-100 leading-snug">
+                                Загрузка вопроса...
+                            </h3>
+                        </div>
+
+                        <!-- Answers Options Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8" id="quiz-answers-container">
+                            <!-- Generated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quiz Feedback & Next Action Footer -->
+                    <div class="mt-8 pt-4 border-t border-slate-800 flex items-center justify-between">
+                        <div id="quiz-feedback" class="text-sm font-semibold text-slate-400">
+                            Выберите правильный вариант ответа
+                        </div>
+                        <button id="quiz-next-btn" onclick="nextQuestion()" disabled class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-500 font-orbitron font-bold text-xs tracking-wider transition-all">
+                            СЛЕДУЮЩИЙ ВОПРОС <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Dialog for Theory Detail -->
+    <div id="theory-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 border border-cyan-500/50 space-y-4 relative transform scale-95 transition-all duration-300" id="modal-card">
+            <button onclick="closeTheoryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-4">
+                <div id="modal-icon-bg" class="w-14 h-14 rounded-2xl bg-cyan-950 flex items-center justify-center text-3xl text-cyan-400 border border-cyan-800">
+                    <i id="modal-icon" class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <h3 id="modal-title" class="font-orbitron font-bold text-xl text-white">Процессор (CPU)</h3>
+                    <p id="modal-subtitle" class="text-xs text-cyan-400">Мозг компьютера</p>
+                </div>
+            </div>
+            <p id="modal-desc" class="text-sm text-slate-300 leading-relaxed">Описание детали...</p>
+            <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1.5">
+                <div class="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Ключевые параметры:</div>
+                <div id="modal-specs" class="text-cyan-300 font-mono">Тактовая частота, ядра, кэш-память</div>
+            </div>
+            <button onclick="closeTheoryModal()" class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-orbitron text-xs tracking-wider">
+                ПОНЯТНО
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 glass-panel mt-12 py-6 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-cyan-400 text-base"></i>
+                <span>Учебный интерактивный проект для школы &copy; 2026 CyberBuild</span>
+            </div>
+            <div class="flex space-x-4">
+                <span class="hover:text-cyan-400 transition-colors cursor-pointer" onclick="switchTab('home')">Теория</span>
+                <span class="hover:text-cyan-400 transition-colors cursor-pointer" onclick="switchTab('builder')">Конструктор</span>
+                <span class="hover:text-cyan-400 transition-colors cursor-pointer" onclick="switchTab('quiz')">Викторина</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /* ----------------------------------------------------
+           DATA & STATE MANAGEMENT
+        ---------------------------------------------------- */
+        
+        // Sound System Web Audio API Synth Effects
+        let soundEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type = 'sine', duration = 0.15) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('sound-btn');
+            const icon = document.getElementById('sound-icon');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                btn.classList.remove('text-slate-500');
+                btn.classList.add('text-cyan-400');
+                playTone(600);
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+                btn.classList.add('text-slate-500');
+                btn.classList.remove('text-cyan-400');
+            }
+        }
+
+        // Theory Data
+        const theoryData = [
+            {
+                id: 'cpu',
+                name: 'Процессор (CPU)',
+                role: 'Мозг компьютера',
+                icon: 'fa-microchip',
+                color: 'from-cyan-500 to-blue-600',
+                shortDesc: 'Выполняет все программы, математические расчёты и логические команды.',
+                fullDesc: 'Центральный процессор (CPU) — главный вычислительный элемент. Он обрабатывает поток инструкций от операционной системы и программ.',
+                specs: 'Ядра (2-16+), Тактовая частота (ГГц), Кэш-память L3, Сокет.'
+            },
+            {
+                id: 'gpu',
+                name: 'Видеокарта (GPU)',
+                role: 'Графический движок',
+                icon: 'fa-gamepad',
+                color: 'from-purple-500 to-pink-600',
+                shortDesc: 'Отвечает за обработку и вывод графика, 3D-моделей и видео на монитор.',
+                fullDesc: 'Видеокарта занимается вычислением пикселей, 3D-графики и эффектов освещения в играх и видеоредакторах.',
+                specs: 'Видеопамять GDDR6 (4-24 ГБ), Шина памяти, Частота чипа.'
+            },
+            {
+                id: 'motherboard',
+                name: 'Материнская плата',
+                role: 'Нервная система',
+                icon: 'fa-table-cells-large',
+                color: 'from-emerald-500 to-teal-600',
+                shortDesc: 'Основная плата, связывающая все детали ПК в одну единую систему.',
+                fullDesc: 'Материнская плата объединяет Процессор, ОЗУ, видеокарту и накопители через быстрые шины данных.',
+                specs: 'Сокет, Чипсет, Форм-фактор (ATX, Micro-ATX), Слоты PCI-e.'
+            },
+            {
+                id: 'ram',
+                name: 'Оперативная память (RAM)',
+                role: 'Быстрая память',
+                icon: 'fa-memory',
+                color: 'from-amber-500 to-orange-600',
+                shortDesc: 'Временное хранилище данных запущенных программ и игр для мгновенного доступа.',
+                fullDesc: 'ОЗУ хранит файлы, с которыми процессор работает прямо сейчас. При выключении ПК эти данные очищаются.',
+                specs: 'Объём (8-64 ГБ), Тип (DDR4/DDR5), Частота (МГц).'
+            },
+            {
+                id: 'storage',
+                name: 'Накопитель (SSD / HDD)',
+                role: 'Постоянная память',
+                icon: 'fa-hard-drive',
+                color: 'from-indigo-500 to-purple-600',
+                shortDesc: 'Хранит операционную систему Windows, игры, фото и личные файлы.',
+                fullDesc: 'SSD (твердотельный накопитель) работает со скоростью до 7000 МБ/с, загружая систему за секунды!',
+                specs: 'Скорость чтения/записи, Объём (512ГБ - 4ТБ), Интерфейс NVMe.'
+            },
+            {
+                id: 'psu',
+                name: 'Блок питания (PSU)',
+                role: 'Сердце и энергия',
+                icon: 'fa-bolt',
+                color: 'from-yellow-400 to-amber-600',
+                shortDesc: 'Преобразует ток из розетки 220V в безопасное напряжение для комплектующих.',
+                fullDesc: 'Блок питания снабжает электроэнергией всю систему. Важна стабильность напряжения и мощность.',
+                specs: 'Мощность (Вт), Сертификат 80 PLUS (Gold/Bronze).'
+            },
+            {
+                id: 'cooling',
+                name: 'Охлаждение (Кулер)',
+                role: 'Климат-контроль',
+                icon: 'fa-fan',
+                color: 'from-cyan-400 to-teal-400',
+                shortDesc: 'Отводит лишнее тепло от горячего процессора, предотвращая перегрев.',
+                fullDesc: 'Бывают воздушными (радиатор с вентилятором) или водяными (СВО) для самых мощных игровых систем.',
+                specs: 'TDP ( рассеиваемая мощность в Вт), Уровень шума, Размер.'
+            },
+            {
+                id: 'case',
+                name: 'Корпус ПК (Case)',
+                role: 'Защитный дом',
+                icon: 'fa-box font-bold',
+                color: 'from-rose-500 to-red-600',
+                shortDesc: 'Защищает детали от пыли и ударов, обеспечивает продуваемость воздухом.',
+                fullDesc: 'Красивый корпус с закаленным стеклом и пылевыми фильтрами украшает рабочее место игрока.',
+                specs: 'Форм-фактор, Подсветка RGB, Вентиляция.'
+            }
+        ];
+
+        // PC Builder items list
+        const builderParts = [
+            { id: 'part-cpu', type: 'cpu', name: 'Intel Core i7 / Ryzen 7', price: 28000, power: 120, icon: 'fa-microchip', color: 'text-cyan-400' },
+            { id: 'part-gpu', type: 'gpu', name: 'Nvidia RTX 4070 12GB', price: 65000, power: 240, icon: 'fa-gamepad', color: 'text-purple-400' },
+            { id: 'part-motherboard', type: 'motherboard', name: 'Плата B650 / Z790 ATX', price: 18000, power: 30, icon: 'fa-table-cells-large', color: 'text-emerald-400' },
+            { id: 'part-ram', type: 'ram', name: '32GB DDR5 (2x16GB)', price: 12000, power: 45, icon: 'fa-memory', color: 'text-amber-400' },
+            { id: 'part-storage', type: 'storage', name: '1TB M.2 NVMe HighSSD', price: 8500, power: 35, icon: 'fa-hard-drive', color: 'text-indigo-400' },
+            { id: 'part-psu', type: 'psu', name: 'Блок питания 750W Gold', price: 9500, power: 10, icon: 'fa-bolt', color: 'text-yellow-400' },
+            { id: 'part-cooling', type: 'cooling', name: 'Башенный Кулер 220W', price: 4000, power: 20, icon: 'fa-fan', color: 'text-cyan-300' }
+        ];
+
+        // Slots in Case
+        const builderSlots = [
+            { id: 'slot-motherboard', type: 'motherboard', name: 'Слот Материнской платы', installed: null },
+            { id: 'slot-cpu', type: 'cpu', name: 'Сокет Процессора', installed: null },
+            { id: 'slot-cooling', type: 'cooling', name: 'Крепление Охлаждения', installed: null },
+            { id: 'slot-ram', type: 'ram', name: 'Слоты ОЗУ (RAM)', installed: null },
+            { id: 'slot-gpu', type: 'gpu', name: 'Разъём PCI-Express (GPU)', installed: null },
+            { id: 'slot-storage', type: 'storage', name: 'Слот SSD M.2', installed: null },
+            { id: 'slot-psu', type: 'psu', name: 'Отсек Блока Питания', installed: null }
+        ];
+
+        // Quiz Questions
+        const quizQuestions = [
+            {
+                question: 'Какое устройство называют "мозгом" компьютера, выполняющим основные команды?',
+                options: ['Видеокарта', 'Процессор (CPU)', 'Оперативная память', 'Блок питания'],
+                correct: 1,
+                explanation: 'Процессор (CPU) обрабатывает все инструкции и вычисления программ.'
+            },
+            {
+                question: 'Что происходит с данными в оперативной памяти (RAM) при выключении ПК?',
+                options: ['Сохраняются навсегда', 'Полностью очищаются', 'Переносятся в интернет', 'Превращаются в резервную копию'],
+                correct: 1,
+                explanation: 'ОЗУ — это энергозависимая память, которая полностью очищается без питания.'
+            },
+            {
+                question: 'Какой компонент отвечает за вывод красивой 3D-графики в современных играх?',
+                options: ['Материнская плата', 'Звуковая карта', 'Видеокарта (GPU)', 'Кулер'],
+                correct: 2,
+                explanation: 'Видеокарта специально разработана для параллельного просчета графики.'
+            },
+            {
+                question: 'Для чего предназначен накопитель SSD?',
+                options: ['Охлаждать систему', 'Хранить операционную систему, игры и файлы', 'Преобразовывать напряжение', 'Соединять клавиши'],
+                correct: 1,
+                explanation: 'SSD — это быстрая постоянная память для хранения всех ваших файлов.'
+            },
+            {
+                question: 'Что случится, если включить мощный процессор без системы охлаждения (кулера)?',
+                options: ['Он станет работать быстрее', 'Он мгновенно перегреется и отключится', 'Ничего не изменится', 'Появится больше памяти'],
+                correct: 1,
+                explanation: 'Без охлаждения процессор за секунды нагреется выше 100°C и сработает защита от перегрева.'
+            }
+        ];
+
+        // Simulated Virtual Opponents
+        let leaderboard = [
+            { name: 'Кибер-Бот Byte', score: 450, isBot: true },
+            { name: 'Алексей (Школа №12)', score: 380, isBot: false },
+            { name: 'Мария_Gamer', score: 310, isBot: false },
+            { name: 'Вы (Игрок)', score: 0, isPlayer: true }
+        ];
+
+        let currentQuestionIdx = 0;
+        let playerScore = 0;
+        let quizTimerVal = 15;
+        let quizInterval = null;
+
+        /* ----------------------------------------------------
+           NAVIGATION & UI LOGIC
+        ---------------------------------------------------- */
+        function switchTab(tabId) {
+            playTone(500);
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-cyan-400', 'bg-slate-800', 'shadow-sm');
+                btn.classList.add('text-slate-400');
+            });
+
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('text-cyan-400', 'bg-slate-800', 'shadow-sm');
+                activeNav.classList.remove('text-slate-400');
+            }
+
+            if (tabId === 'quiz' && currentQuestionIdx === 0) {
+                startQuiz();
+            }
+        }
+
+        /* ----------------------------------------------------
+           THEORY CARDS RENDERING & MODAL
+        ---------------------------------------------------- */
+        function renderTheoryCards() {
+            const container = document.getElementById('theory-grid');
+            container.innerHTML = theoryData.map(item => `
+                <div onclick="openTheoryModal('${item.id}')" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1.5 cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${item.color} flex items-center justify-center text-black text-2xl mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fa-solid ${item.icon}"></i>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg text-white group-hover:text-cyan-400 transition-colors">${item.name}</h3>
+                        <p class="text-xs text-cyan-400 font-semibold mb-2">${item.role}</p>
+                        <p class="text-xs text-slate-400 leading-relaxed">${item.shortDesc}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 group-hover:text-cyan-300">
+                        <span>Подробнее</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openTheoryModal(id) {
+            playTone(700);
+            const item = theoryData.find(t => t.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-title').textContent = item.name;
+            document.getElementById('modal-subtitle').textContent = item.role;
+            document.getElementById('modal-desc').textContent = item.fullDesc;
+            document.getElementById('modal-specs').textContent = item.specs;
+            document.getElementById('modal-icon').className = `fa-solid ${item.icon}`;
+
+            const modal = document.getElementById('theory-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+        }
+
+        function closeTheoryModal() {
+            playTone(400);
+            const modal = document.getElementById('theory-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+
+        /* ----------------------------------------------------
+           PC BUILDER LOGIC (DRAG & DROP)
+        ---------------------------------------------------- */
+        function renderBuilder() {
+            // Render available palette
+            const palette = document.getElementById('parts-palette');
+            palette.innerHTML = builderParts.map(part => {
+                const isInstalled = builderSlots.some(s => s.installed && s.installed.id === part.id);
+                return `
+                    <div id="${part.id}" 
+                         draggable="${!isInstalled}" 
+                         ondragstart="handleDragStart(event, '${part.id}')"
+                         onclick="clickToInstall('${part.id}')"
+                         class="draggable-item glass-panel p-3.5 rounded-xl border ${isInstalled ? 'border-slate-800 opacity-40 grayscale' : 'border-slate-700 hover:border-cyan-400'} flex items-center justify-between transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center ${part.color} text-lg border border-slate-800">
+                                <i class="fa-solid ${part.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-xs text-white">${part.name}</div>
+                                <div class="text-[11px] text-slate-400">${part.price.toLocaleString()} ₽ • +${part.power} FPS</div>
+                            </div>
+                        </div>
+                        <span class="text-xs ${isInstalled ? 'text-slate-500' : 'text-cyan-400'}">
+                            ${isInstalled ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-plus"></i>'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            // Render slots
+            const slotsContainer = document.getElementById('slots-container');
+            slotsContainer.innerHTML = builderSlots.map(slot => {
+                const item = slot.installed;
+                return `
+                    <div ondragover="handleDragOver(event)" 
+                         ondragleave="handleDragLeave(event)" 
+                         ondrop="handleDrop(event, '${slot.id}')"
+                         onclick="removePartFromSlot('${slot.id}')"
+                         class="drop-slot glass-panel p-3.5 rounded-xl border-2 ${item ? 'border-green-500/50 bg-green-950/10' : 'border-dashed border-slate-700 hover:border-slate-500'} flex items-center justify-between min-h-[72px] transition-all cursor-pointer">
+                        ${item ? `
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-green-950 flex items-center justify-center text-green-400 border border-green-800 text-base">
+                                    <i class="fa-solid ${item.icon}"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-green-300">${item.name}</div>
+                                    <div class="text-[10px] text-slate-400">${slot.name}</div>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-xmark text-slate-500 hover:text-red-400 text-xs"></i>
+                        ` : `
+                            <div class="flex items-center gap-2 text-slate-500">
+                                <i class="fa-solid fa-circle-dot text-xs"></i>
+                                <span class="text-xs font-medium">${slot.name}</span>
+                            </div>
+                            <span class="text-[10px] text-slate-600 font-mono">СЛОТ</span>
+                        `}
+                    </div>
+                `;
+            }).join('');
+
+            updateBuilderTotals();
+        }
+
+        function handleDragStart(e, partId) {
+            e.dataTransfer.setData('text/plain', partId);
+            playTone(300);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e, slotId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const partId = e.dataTransfer.getData('text/plain');
+            installPart(partId, slotId);
+        }
+
+        function clickToInstall(partId) {
+            const part = builderParts.find(p => p.id === partId);
+            if (!part) return;
+            const slot = builderSlots.find(s => s.type === part.type);
+            if (slot) {
+                installPart(partId, slot.id);
+            }
+        }
+
+        function installPart(partId, slotId) {
+            const part = builderParts.find(p => p.id === partId);
+            const slot = builderSlots.find(s => s.id === slotId);
+
+            if (part && slot && slot.type === part.type) {
+                slot.installed = part;
+                playTone(800, 'sine', 0.2);
+                renderBuilder();
+            } else {
+                playTone(150, 'sawtooth', 0.2);
+                alert('Эта деталь не подходит в данный слот!');
+            }
+        }
+
+        function removePartFromSlot(slotId) {
+            const slot = builderSlots.find(s => s.id === slotId);
+            if (slot && slot.installed) {
+                playTone(400);
+                slot.installed = null;
+                renderBuilder();
+            }
+        }
+
+        function updateBuilderTotals() {
+            let price = 0;
+            let power = 0;
+            let count = 0;
+
+            builderSlots.forEach(s => {
+                if (s.installed) {
+                    price += s.installed.price;
+                    power += s.installed.power;
+                    count++;
+                }
+            });
+
+            document.getElementById('builder-price').textContent = `${price.toLocaleString()} ₽`;
+            document.getElementById('builder-power').textContent = `${power} FPS`;
+            document.getElementById('assembly-progress').textContent = `Собрано: ${count} / ${builderSlots.length}`;
+
+            const testBtn = document.getElementById('test-build-btn');
+            if (count === builderSlots.length) {
+                testBtn.disabled = false;
+                testBtn.className = 'w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold font-orbitron text-sm tracking-wider shadow-lg shadow-green-500/30 transition-all hover:scale-105 cursor-pointer';
+            } else {
+                testBtn.disabled = true;
+                testBtn.className = 'w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-800 text-slate-500 font-bold font-orbitron text-sm tracking-wider cursor-not-allowed transition-all';
+            }
+        }
+
+        function resetBuilder() {
+            playTone(300);
+            builderSlots.forEach(s => s.installed = null);
+            renderBuilder();
+        }
+
+        function runBuildTest() {
+            playTone(1000, 'sine', 0.4);
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+            alert(' ПОЗДРАВЛЯЕМ! Ваш игровой ПК успешно запущен!\nВсе системы работают идеально. Мощность системы: HIGH-END GAMING!');
+        }
+
+        /* ----------------------------------------------------
+           QUIZ & BOT SYSTEM
+        ---------------------------------------------------- */
+        function startQuiz() {
+            currentQuestionIdx = 0;
+            playerScore = 0;
+            updateLeaderboardUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(quizInterval);
+            const q = quizQuestions[currentQuestionIdx];
+
+            document.getElementById('quiz-question-counter').textContent = `Вопрос ${currentQuestionIdx + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-question-text').textContent = q.question;
+            document.getElementById('quiz-feedback').textContent = 'Выберите один вариант ответа';
+            document.getElementById('quiz-feedback').className = 'text-sm font-semibold text-slate-400';
+            
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.disabled = true;
+            nextBtn.className = 'px-5 py-2.5 rounded-xl bg-slate-800 text-slate-500 font-orbitron font-bold text-xs tracking-wider transition-all cursor-not-allowed';
+
+            // Render Answer choices
+            const container = document.getElementById('quiz-answers-container');
+            container.innerHTML = q.options.map((opt, idx) => `
+                <button onclick="selectAnswer(${idx})" class="answer-btn glass-panel p-4 rounded-xl border border-slate-700 hover:border-cyan-400 text-left text-sm text-slate-200 transition-all hover:bg-slate-800/80 flex items-center justify-between group">
+                    <span>${opt}</span>
+                    <span class="w-6 h-6 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-xs text-slate-400 group-hover:border-cyan-400 group-hover:text-cyan-400">${String.fromCharCode(65 + idx)}</span>
+                </button>
+            `).join('');
+
+            // Reset Timer
+            quizTimerVal = 15;
+            document.getElementById('quiz-timer').textContent = `${quizTimerVal} сек`;
+            
+            updateBotDialog('Думай быстрее! Таймер пошел!');
+
+            quizInterval = setInterval(() => {
+                quizTimerVal--;
+                document.getElementById('quiz-timer').textContent = `${quizTimerVal} сек`;
+                if (quizTimerVal <= 0) {
+                    clearInterval(quizInterval);
+                    autoTimeOutAnswer();
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(selectedIdx) {
+            clearInterval(quizInterval);
+            const q = quizQuestions[currentQuestionIdx];
+            const buttons = document.querySelectorAll('.answer-btn');
+
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedIdx === q.correct) {
+                playTone(900, 'sine', 0.3);
+                buttons[selectedIdx].classList.add('border-green-500', 'bg-green-950/40', 'text-green-300');
+                playerScore += 100 + quizTimerVal * 5;
+                document.getElementById('quiz-feedback').textContent = ` Верно! ${q.explanation}`;
+                document.getElementById('quiz-feedback').className = 'text-sm font-semibold text-green-400';
+                updateBotDialog('Отличный ответ! Ты действительно разбираешься в компьютерах!');
+            } else {
+                playTone(200, 'sawtooth', 0.3);
+                buttons[selectedIdx].classList.add('border-red-500', 'bg-red-950/40', 'text-red-300');
+                buttons[q.correct].classList.add('border-green-500', 'bg-green-950/40');
+                document.getElementById('quiz-feedback').textContent = ` Ошибка! ${q.explanation}`;
+                document.getElementById('quiz-feedback').className = 'text-sm font-semibold text-red-400';
+                updateBotDialog('Ой! Не угадал. Запомни правильное правило!');
+            }
+
+            // Simulate Bot & virtual opponents answering simultaneously
+            simulateOpponents();
+
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = 'px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold text-xs tracking-wider transition-all cursor-pointer shadow-lg shadow-cyan-500/20';
+        }
+
+        function autoTimeOutAnswer() {
+            playTone(200, 'sawtooth', 0.3);
+            const q = quizQuestions[currentQuestionIdx];
+            document.querySelectorAll('.answer-btn')[q.correct].classList.add('border-green-500', 'bg-green-950/40');
+            document.getElementById('quiz-feedback').textContent = ` Время вышло! ${q.explanation}`;
+            document.getElementById('quiz-feedback').className = 'text-sm font-semibold text-red-400';
+            updateBotDialog('Время истекло! Будь внимательнее в следующем раунде.');
+            
+            simulateOpponents();
+
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = 'px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold text-xs tracking-wider transition-all cursor-pointer';
+        }
+
+        function simulateOpponents() {
+            // Update score
+            const playerObj = leaderboard.find(l => l.isPlayer);
+            if (playerObj) playerObj.score = playerScore;
+
+            // Random bot points increment
+            leaderboard.forEach(l => {
+                if (l.isBot || (!l.isPlayer && !l.isBot)) {
+                    if (Math.random() > 0.25) {
+                        l.score += Math.floor(Math.random() * 80) + 50;
+                    }
+                }
+            });
+
+            leaderboard.sort((a, b) => b.score - a.score);
+            updateLeaderboardUI();
+        }
+
+        function updateLeaderboardUI() {
+            const container = document.getElementById('leaderboard-list');
+            container.innerHTML = leaderboard.map((item, idx) => `
+                <div class="flex items-center justify-between p-2 rounded-lg ${item.isPlayer ? 'bg-cyan-950/60 border border-cyan-500/40 font-bold' : 'bg-slate-900/60 border border-slate-800'}">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-slate-400 text-black' : 'bg-slate-800 text-slate-400'} flex items-center justify-center font-bold text-[10px]">
+                            ${idx + 1}
+                        </span>
+                        <span class="${item.isPlayer ? 'text-cyan-300' : 'text-slate-300'}">${item.name}</span>
+                    </div>
+                    <span class="font-mono text-cyan-400 font-bold">${item.score} б</span>
+                </div>
+            `).join('');
+        }
+
+        function updateBotDialog(text) {
+            document.getElementById('bot-dialog-text').textContent = text;
+        }
+
+        function nextQuestion() {
+            playTone(600);
+            currentQuestionIdx++;
+            if (currentQuestionIdx < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(quizInterval);
+            confetti({ particleCount: 150, spread: 90 });
+            
+            const playerRank = leaderboard.findIndex(l => l.isPlayer) + 1;
+            updateBotDialog(`Игра окончена! Вы заняли ${playerRank} место с результатом ${playerScore} баллов!`);
+            
+            document.getElementById('quiz-question-text').textContent = ' Викторина завершена!';
+            document.getElementById('quiz-answers-container').innerHTML = `
+                <div class="col-span-2 text-center glass-panel p-8 rounded-2xl border border-cyan-500/40 space-y-4">
+                    <i class="fa-solid fa-trophy text-5xl text-yellow-400 mb-2 animate-bounce"></i>
+                    <h3 class="font-orbitron text-2xl font-bold text-cyan-300">Ваш результат: ${playerScore} баллов</h3>
+                    <p class="text-xs text-slate-400">Отличная работа! Попробуй пройти ещё раз, чтобы улучшить счёт.</p>
+                    <button onclick="startQuiz()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-black font-orbitron font-bold text-xs uppercase tracking-wider hover:scale-105 transition-all">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Начать заново
+                    </button>
+                </div>
+            `;
+            document.getElementById('quiz-feedback').textContent = '';
+            document.getElementById('quiz-next-btn').disabled = true;
+        }
+
+        /* ----------------------------------------------------
+           APPLICATION INITIALIZATION
+        ---------------------------------------------------- */
+        window.onload = function() {
+            renderTheoryCards();
+            renderBuilder();
+        };
+    </script>
+</body>
+</html>
